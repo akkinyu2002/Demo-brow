@@ -1,10 +1,21 @@
 import sys
 
-from PySide6.QtCore import QUrl
-from PySide6.QtGui import QAction, QKeySequence
+from PySide6.QtCore import Qt, QUrl
+from PySide6.QtGui import (
+    QAction,
+    QColor,
+    QFont,
+    QIcon,
+    QKeySequence,
+    QLinearGradient,
+    QPainter,
+    QPen,
+    QPixmap,
+)
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (
     QApplication,
+    QLabel,
     QLineEdit,
     QMainWindow,
     QMessageBox,
@@ -34,6 +45,16 @@ class SimpleBrowser(QMainWindow):
         toolbar.setMovable(False)
         self.addToolBar(toolbar)
 
+        logo = self._generate_ai_logo()
+        logo_label = QLabel(self)
+        logo_label.setPixmap(logo)
+        logo_label.setToolTip("AI Browser")
+        logo_label.setFixedSize(logo.size())
+        toolbar.addWidget(logo_label)
+        toolbar.addSeparator()
+
+        self.setWindowIcon(QIcon(logo))
+
         back_action = QAction("Back", self)
         back_action.setShortcut(QKeySequence("Alt+Left"))
         back_action.triggered.connect(self.web_view.back)
@@ -58,8 +79,47 @@ class SimpleBrowser(QMainWindow):
 
         self.url_bar = QLineEdit(self)
         self.url_bar.setPlaceholderText("Enter URL (example: openai.com)")
+        self.url_bar.setMinimumWidth(500)
         self.url_bar.returnPressed.connect(self.navigate_to_url)
         toolbar.addWidget(self.url_bar)
+
+    def _generate_ai_logo(self) -> QPixmap:
+        width = 140
+        height = 42
+        pixmap = QPixmap(width, height)
+        pixmap.fill(Qt.GlobalColor.transparent)
+
+        painter = QPainter(pixmap)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        background = QLinearGradient(0, 0, width, height)
+        background.setColorAt(0.0, QColor("#0B1220"))
+        background.setColorAt(1.0, QColor("#1E293B"))
+        painter.setBrush(background)
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.drawRoundedRect(0, 0, width, height, 10, 10)
+
+        painter.setPen(QPen(QColor("#22D3EE"), 2))
+        painter.drawLine(14, 12, 48, 12)
+        painter.drawLine(14, 21, 38, 21)
+        painter.drawLine(14, 30, 46, 30)
+
+        painter.setBrush(QColor("#38BDF8"))
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.drawEllipse(48, 9, 6, 6)
+        painter.drawEllipse(38, 18, 6, 6)
+        painter.drawEllipse(46, 27, 6, 6)
+
+        painter.setPen(QColor("#F8FAFC"))
+        painter.setFont(QFont("Segoe UI", 15, QFont.Weight.Bold))
+        painter.drawText(62, 23, "AI")
+
+        painter.setPen(QColor("#CBD5E1"))
+        painter.setFont(QFont("Segoe UI", 8))
+        painter.drawText(62, 34, "Browser")
+
+        painter.end()
+        return pixmap
 
     def _create_statusbar(self) -> None:
         status = QStatusBar(self)
