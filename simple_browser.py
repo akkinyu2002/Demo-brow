@@ -7,7 +7,6 @@ from PySide6.QtGui import (
     QFont,
     QIcon,
     QKeySequence,
-    QLinearGradient,
     QPainter,
     QPen,
     QPixmap,
@@ -45,10 +44,10 @@ class SimpleBrowser(QMainWindow):
         toolbar.setMovable(False)
         self.addToolBar(toolbar)
 
-        logo = self._generate_ai_logo()
+        logo = self._generate_logo()
         logo_label = QLabel(self)
         logo_label.setPixmap(logo)
-        logo_label.setToolTip("AI Browser")
+        logo_label.setToolTip("Browser")
         logo_label.setFixedSize(logo.size())
         toolbar.addWidget(logo_label)
         toolbar.addSeparator()
@@ -83,8 +82,8 @@ class SimpleBrowser(QMainWindow):
         self.url_bar.returnPressed.connect(self.navigate_to_url)
         toolbar.addWidget(self.url_bar)
 
-    def _generate_ai_logo(self) -> QPixmap:
-        width = 140
+    def _generate_logo(self) -> QPixmap:
+        width = 150
         height = 42
         pixmap = QPixmap(width, height)
         pixmap.fill(Qt.GlobalColor.transparent)
@@ -92,31 +91,27 @@ class SimpleBrowser(QMainWindow):
         painter = QPainter(pixmap)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        background = QLinearGradient(0, 0, width, height)
-        background.setColorAt(0.0, QColor("#0B1220"))
-        background.setColorAt(1.0, QColor("#1E293B"))
-        painter.setBrush(background)
-        painter.setPen(Qt.PenStyle.NoPen)
-        painter.drawRoundedRect(0, 0, width, height, 10, 10)
+        painter.setBrush(QColor("#FFFFFF"))
+        painter.setPen(QPen(QColor("#D1D5DB"), 1))
+        painter.drawRoundedRect(0, 0, width - 1, height - 1, 10, 10)
 
-        painter.setPen(QPen(QColor("#22D3EE"), 2))
-        painter.drawLine(14, 12, 48, 12)
-        painter.drawLine(14, 21, 38, 21)
-        painter.drawLine(14, 30, 46, 30)
+        icon_x = 10
+        icon_y = 8
+        icon_size = 26
+        painter.setBrush(Qt.BrushStyle.NoBrush)
+        painter.setPen(QPen(QColor("#1F4B99"), 2))
+        painter.drawEllipse(icon_x, icon_y, icon_size, icon_size)
+        painter.drawEllipse(icon_x + 7, icon_y, icon_size - 14, icon_size)
+        painter.drawLine(
+            icon_x,
+            icon_y + (icon_size // 2),
+            icon_x + icon_size,
+            icon_y + (icon_size // 2),
+        )
 
-        painter.setBrush(QColor("#38BDF8"))
-        painter.setPen(Qt.PenStyle.NoPen)
-        painter.drawEllipse(48, 9, 6, 6)
-        painter.drawEllipse(38, 18, 6, 6)
-        painter.drawEllipse(46, 27, 6, 6)
-
-        painter.setPen(QColor("#F8FAFC"))
-        painter.setFont(QFont("Segoe UI", 15, QFont.Weight.Bold))
-        painter.drawText(62, 23, "AI")
-
-        painter.setPen(QColor("#CBD5E1"))
-        painter.setFont(QFont("Segoe UI", 8))
-        painter.drawText(62, 34, "Browser")
+        painter.setPen(QColor("#111827"))
+        painter.setFont(QFont("Segoe UI", 12, QFont.Weight.DemiBold))
+        painter.drawText(46, 26, "Browser")
 
         painter.end()
         return pixmap
